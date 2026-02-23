@@ -1,0 +1,11 @@
+{
+    "host": "archipelago.gg",
+    "port": 0,
+    "slot": "",
+    "discordToken": "",
+    "trackerChannelId": "",
+    "hintsChannelId": "",
+    "players": {
+        "Test": ""
+    }
+}

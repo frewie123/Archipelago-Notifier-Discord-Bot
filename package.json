@@ -1,0 +1,11 @@
+{
+  "name": "archipelago-notifier-discord-bot",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "archipelago.js": "^2.0.4",
+    "discord.js": "^14.25.1"
+  }
+}

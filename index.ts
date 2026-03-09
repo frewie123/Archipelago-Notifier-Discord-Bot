@@ -1,10 +1,43 @@
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
 import { Client as APClient } from "archipelago.js";
 import {
   Client as DiscordClient,
   GatewayIntentBits,
   TextChannel,
 } from "discord.js";
-import CONFIG from './config.json';
+
+interface Config {
+  host: string;
+  port: number;
+  slot: string;
+  discordToken: string;
+  trackerChannelId: string;
+  hintsChannelId: string;
+  players: Record<string, string>;
+}
+
+const loadConfig = (): Config => {
+  const exeDir = dirname(process.execPath);
+  const cwd = process.cwd();
+  const candidates = [
+    join(exeDir, "config.json"),
+    join(cwd, "config.json"),
+  ];
+  for (const p of candidates) {
+    try {
+      const raw = readFileSync(p, "utf-8");
+      return JSON.parse(raw) as Config;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error(
+    `config.json not found. Place it next to the executable or in the current directory. Tried: ${candidates.join(", ")}`
+  );
+}
+
+const CONFIG = loadConfig();
 
 const Players = CONFIG.players;
 const Address = `${CONFIG.host}:${CONFIG.port}`
@@ -51,6 +84,7 @@ const connectArchipelago = async () => {
   });
 
   ap.messages.on("itemHinted", async (text, item) => {
+      logWithTime(text);
       let message = "**HINT:** ";
 
       if (item.sender.name === item.receiver.name) {

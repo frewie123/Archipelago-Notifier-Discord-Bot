@@ -83,7 +83,7 @@ const connectArchipelago = async (slot: string) => {
 
     if (item.receiver.name === ap.name) {
       const recieverName = item.receiver.name === item.sender.name ? "their" : `<@${Players[sender]}>'s`;
-      const message = `**HINT**: <@${Players[receiver]}>'s **${item.name}** is at ${item.locationName} in ${recieverName} world.`;
+      const message = `**HINT**: <@${Players[receiver]}>'s **${item.name}** is at **${item.locationName}** in ${recieverName} world.`;
 
       logWithTime(message);
       hintsChannel.send(message).catch(console.error);

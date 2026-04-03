@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # Config File
 config.json
+
+# Goal Images
+goal_images/*

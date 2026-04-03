@@ -1,12 +1,15 @@
 {
     "host": "archipelago.gg",
     "port": 0,
-    "slot": "",
     "discordToken": "",
+    "guildId": "",
     "trackerChannelId": "",
     "hintsChannelId": "",
+    "generalChannelId": "",
     "players": {
         "Test": "",
         "Test2": ""
-    }
+    },
+    "serverOwner": "",
+    "goalImagesPath": "./goal_images"
 }

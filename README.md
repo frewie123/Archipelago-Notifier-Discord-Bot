@@ -1,6 +1,15 @@
 # Archipelago Notifier Discord Bot
 This is a simple Discord bot that will notify players about found items and hints. It supports mapping Discord usernames to Archipelago world names so that users will get pinged if an item is found.
 
+# Features
+- Posts updates every time someone finds an item.
+- Allows users to use hints within the discord server.
+  - `/hint {item_name}`: Use a hint for a specified item.
+  - `/hint_location {location_name}`: Use a hint for a location.
+  - `/hint_balance`: Shows hint point balance and cost of using hints.
+- Has a command to show the status of the world via `/status`. This shows who is online, the games they're playing, and their completion percentage. Shows a checkmark next to a player if they completed their goal.
+- Posts a message if a player has reached their goal with optional images to post with the message.
+
 # Setup
 
 ### Important Notes
@@ -23,13 +32,15 @@ This is a simple Discord bot that will notify players about found items and hint
 **Steps:**
 - Clone or download this repository on your computer.
 - Open the config.example.json file in a text editor. Edit the following properties:
-  - **"host"**: Don't think you will need to change this, but is configurable if you need to.
-  - **"port"**: The port number of your world.
-  - **"slot"**: Set this to your player name in your world.
-  - **"discordToken"**: Get that token you saved earlier and paste it in the empty quotes.
-  - **"trackerChannelId"**: The id of the discord channel you want your tracker updates to go to. Right click your desired channel in Discord and copy the channel ID.
-  - **"hintsChannelId"**: Same deal with the tracker channel, but this is for posting hint notifications.
-  - **"players"**: This is a list of players and their discord IDs so that they can get pinged for notifications. The string on the left of each entry will be the player name in the world and the right string is their discord ID. To get user IDs, right click on a discord user and copy their ID.
+  - `host`: The host address of the server.
+  - `port`: The port number of your world.
+  - `discordToken`: Get that token you saved earlier and paste it in the empty quotes.
+  - `guildId`: The ID of the discord server.
+  - `generalChannelId`: The channel for general discussion for archipelago between players (this is where the goal complete messages will be posted).
+  - `trackerChannelId`: The id of the discord channel you want your tracker updates to go to. Right click your desired channel in Discord and copy the channel ID.
+  - `hintsChannelId`: Same deal with the tracker channel, but this is for posting hint notifications.
+  - `players`: This is a list of players and their discord IDs so that they can get pinged for notifications. The string on the left of each entry will be the player name in the world and the right string is their discord ID. To get user IDs, right click on a discord user and copy their ID.
+  - `serverOwner`: The slot name for the player who is running the server (who is getting pinged if the server is down).
 - Save the file and rename it to "config.json".
 - Open command prompt and navigate to your folder where this repository is stored (Archipelago-Notifier-Discord-Bot).
 - Enter `npm install` and wait for that to finish.

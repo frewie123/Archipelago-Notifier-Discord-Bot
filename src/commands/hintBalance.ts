@@ -1,12 +1,19 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { Command, requireApClient } from "../commandUtils";
+import { Command, resolveApClient } from "../commandUtils";
 
 export const hintBalanceDefinition = new SlashCommandBuilder()
   .setName(Command.HintBalance)
-  .setDescription("Show your current hint point balance and hint cost");
+  .setDescription("Show your current hint point balance and hint cost")
+  .addStringOption((option) =>
+    option
+      .setName("slot")
+      .setDescription("Which of your slots to use (only required if you control multiple)")
+      .setRequired(false)
+  );
 
 export const handleHintBalance = async (interaction: ChatInputCommandInteraction) => {
-  const apClient = await requireApClient(interaction);
+  const slot = interaction.options.getString("slot") ?? undefined;
+  const apClient = await resolveApClient(interaction, slot);
   if (!apClient) return;
 
   const points = apClient.room.hintPoints;

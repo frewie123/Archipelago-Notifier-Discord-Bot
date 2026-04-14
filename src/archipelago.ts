@@ -7,8 +7,49 @@ import { logWithTime } from "./utils";
 
 export let apClients: APClient[] = [];
 export const onlinePlayers = new Set<string>();
+
 let messageEventsSet = false;
 let serverDown = false;
+export let trackerEnabled = false;
+
+let storedTrackerChannel: TextChannel;
+let storedHintsChannel: TextChannel;
+let storedGeneralChannel: TextChannel;
+
+export const setChannels = (
+  tracker: TextChannel,
+  hints: TextChannel,
+  general: TextChannel
+) => {
+  storedTrackerChannel = tracker;
+  storedHintsChannel = hints;
+  storedGeneralChannel = general;
+};
+
+export const enableTracker = () => {
+  trackerEnabled = true;
+  const playerSlots = Object.keys(Players);
+
+  if (apClients.length === 0) {
+    playerSlots.forEach((playerSlot) => {
+      logWithTime(`${playerSlot}`);
+      connectArchipelago(playerSlot, storedTrackerChannel, storedHintsChannel, storedGeneralChannel);
+    });
+  } else {
+    apClients.forEach((client, index) => {
+      login(playerSlots[index], client);
+    });
+  }
+};
+
+export const disableTracker = () => {
+  trackerEnabled = false;
+  apClients.forEach((client) => {
+    client.socket.disconnect();
+  });
+  onlinePlayers.clear();
+  serverDown = false;
+};
 
 const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
 
@@ -85,21 +126,50 @@ export const connectArchipelago = async (
     messageEventsSet = true;
   }
 
+  let hintBuffer: { sender: string; receiver: string; message: string }[] = [];
+  let hintFlushTimer: ReturnType<typeof setTimeout> | null = null;
+
   ap.messages.on("itemHinted", async (text, item) => {
+    if (item.receiver.name !== ap.name) return;
+
     var sender = item.sender.name as keyof typeof Players;
     var receiver = item.receiver.name as keyof typeof Players;
+    const recieverName = item.receiver.name === item.sender.name ? "their" : `<@${Players[sender]}>'s`;
+    const message = `**HINT**: <@${Players[receiver]}>'s **${item.name}** is at **${item.locationName}** in ${recieverName} world.`;
 
-    if (item.receiver.name === ap.name) {
-      const recieverName = item.receiver.name === item.sender.name ? "their" : `<@${Players[sender]}>'s`;
-      const message = `**HINT**: <@${Players[receiver]}>'s **${item.name}** is at **${item.locationName}** in ${recieverName} world.`;
+    hintBuffer.push({ sender: item.sender.name, receiver: item.receiver.name, message });
 
-      logWithTime(message);
-      hintsChannel.send(message).catch(console.error);
-    }
+    if (hintFlushTimer) clearTimeout(hintFlushTimer);
+    hintFlushTimer = setTimeout(() => {
+      if (hintBuffer.length <= 2) {
+        for (const hint of hintBuffer) {
+          logWithTime(hint.message);
+          hintsChannel.send(hint.message).catch(console.error);
+        }
+      } else {
+        logWithTime(`Suppressed ${hintBuffer.length} bulk hint messages.`);
+      }
+      hintBuffer = [];
+      hintFlushTimer = null;
+    }, 500);
   });
 
   apClients.push(ap);
   login(slot, ap);
+};
+
+export const connectPlayer = (slot: string) => {
+  connectArchipelago(slot, storedTrackerChannel, storedHintsChannel, storedGeneralChannel);
+};
+
+export const disconnectPlayer = (slot: string) => {
+  const index = apClients.findIndex((c) => c.name === slot);
+  if (index === -1) return;
+
+  const client = apClients[index];
+  client.socket.disconnect();
+  apClients.splice(index, 1);
+  onlinePlayers.delete(slot);
 };
 
 export const login = (slot: string, ap: APClient) => {
@@ -116,6 +186,8 @@ export const login = (slot: string, ap: APClient) => {
 };
 
 export const checkConnectionStatus = (channel: TextChannel) => {
+  if (!trackerEnabled) return;
+
   if (apClients[0].authenticated) {
     console.log("Connection check successful.");
 

@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 
 export interface Config {
@@ -10,9 +10,12 @@ export interface Config {
   hintsChannelId: string;
   generalChannelId: string;
   players: Record<string, string>;
+  admins: string[];
   serverOwner?: string;
   goalImagesPath?: string;
 }
+
+let configPath: string;
 
 const loadConfig = (): Config => {
   const exeDir = dirname(process.execPath);
@@ -21,6 +24,7 @@ const loadConfig = (): Config => {
   for (const p of candidates) {
     try {
       const raw = readFileSync(p, "utf-8");
+      configPath = p;
       return JSON.parse(raw) as Config;
     } catch {
       continue;
@@ -31,6 +35,10 @@ const loadConfig = (): Config => {
       ", "
     )}`
   );
+};
+
+export const saveConfig = () => {
+  writeFileSync(configPath, JSON.stringify(CONFIG, null, 4), "utf-8");
 };
 
 export const CONFIG = loadConfig();

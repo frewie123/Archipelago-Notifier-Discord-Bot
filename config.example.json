@@ -10,6 +10,7 @@
         "Test": "",
         "Test2": ""
     },
+    "admins": [],
     "serverOwner": "",
     "goalImagesPath": "./goal_images"
 }

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { Command, requireApClient, sendHintCommand } from "../commandUtils";
+import { Command, resolveApClient, sendHintCommand } from "../commandUtils";
 import { logWithTime, safeReply } from "../utils";
 
 export const hintLocationDefinition = new SlashCommandBuilder()
@@ -10,10 +10,17 @@ export const hintLocationDefinition = new SlashCommandBuilder()
       .setName("location")
       .setDescription("The name of the location to hint for")
       .setRequired(true)
+  )
+  .addStringOption((option) =>
+    option
+      .setName("slot")
+      .setDescription("Which of your slots to use (only required if you control multiple)")
+      .setRequired(false)
   );
 
 export const handleHintLocation = async (interaction: ChatInputCommandInteraction) => {
-  const apClient = await requireApClient(interaction);
+  const slot = interaction.options.getString("slot") ?? undefined;
+  const apClient = await resolveApClient(interaction, slot);
   if (!apClient) return;
 
   try {

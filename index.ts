@@ -1,6 +1,6 @@
 import { Client as DiscordClient, GatewayIntentBits, TextChannel } from "discord.js";
-import { CONFIG, Players } from "./src/config";
-import { connectArchipelago, checkConnectionStatus } from "./src/archipelago";
+import { CONFIG } from "./src/config";
+import { setChannels, checkConnectionStatus } from "./src/archipelago";
 import { registerCommands, handleInteraction } from "./src/commands";
 import { logWithTime } from "./src/utils";
 
@@ -23,11 +23,8 @@ discord.once("clientReady", async () => {
 
   await registerCommands(discord.user!.id);
 
-  const playerSlots = Object.keys(Players);
-  playerSlots.forEach((playerSlot) => {
-    logWithTime(`${playerSlot}`);
-    connectArchipelago(playerSlot, channel, hintsChannel, generalChannel);
-  });
+  setChannels(channel, hintsChannel, generalChannel);
+  logWithTime("Bot started in disabled mode. Use /enable-tracker to connect.");
 
   setInterval(() => checkConnectionStatus(channel), 300000);
 });
